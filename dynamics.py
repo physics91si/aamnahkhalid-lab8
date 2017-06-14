@@ -15,18 +15,40 @@ import particle
 
 # TODO: Implement this function
 def init_molecule():
-    """Create Particles p1 and p2 inside boundaries and return a molecule
-    connecting them"""
+    molly = particle.Molecule([0.2,0.2], 1,[0.8, 0.8], 2, 1, 0.5)
+    print(molly.get_displ())
+    print(molly.get_force())
 
-    pass
+    return molly
 
 
-# TODO: Implement this function
+
+
 def time_step(dt, mol):
     """Sets new positions and velocities of the particles attached to mol"""
-    
-    pass
+    ##equations from wikipedia page on leapfrog integration. assuming dt is constant
+    a_i1= [x*(1/mol.p1.m) for x in mol.p1.acc]
+    a_i2 = [x*(-1/mol.p2.m) for x in mol.p2.acc]
 
+    new_pos_p1 = [p+q+r for p,q,r in zip(mol.p1.pos, [x*dt for x in mol.p1.vel], [0.5*dt*dt*a for a in a_i1])]
+    mol.p1.pos = new_pos_p1
+
+    new_pos_p2 = [p+q+r for p,q,r in zip(mol.p2.pos,[x*dt for x in mol.p2.vel], [0.5*dt*dt*a for a in a_i2])]
+    mol.p2.pos = new_pos_p2
+
+    a_i1_new= [x*(1/mol.p1.m) for x in mol.get_force()]
+    a_i2_new = [x*(-1/mol.p2.m) for x in mol.get_force()]
+
+
+    new_vel_p1 = [p+q for p,q in (mol.p1.vel, [0.5*(x+y)*dt for x,y in zip (a_i1, a_i1_new)])]
+    mol.p1.vel = new_vel_p1
+    new_vel_p2 = [p+q for p,q in zip(mol.p2.vel, [0.5*(x+y)*dt for x,y in zip (a_i2, a_i2_new)])]
+    mol.p2.vel = new_vel_p2
+
+    print(mol.p1.pos)
+    print(mol.p1.vel) 
+    print(mol.p2.pos)
+    print(mol.p2.vel)
 
 #############################################
 # The rest of the file is already implemented
